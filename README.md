@@ -1,6 +1,6 @@
 # Gost
 
-Gost is an in-progress bot-rewrite of Squiddie, which will be written in Go instead of Python due to the discontinutation of `discord.py`.
+Gost is an in-progress bot-rewrite of Squiddie, which will be written in Go instead of Python due to the discontinuation of `discord.py`.
 
 ## LICENSE
 
