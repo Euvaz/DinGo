@@ -1,4 +1,4 @@
-module github.com/Euvaz/Gost
+module github.com/Euvaz/DinGo
 
 go 1.17
 
