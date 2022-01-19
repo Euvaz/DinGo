@@ -98,7 +98,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
             if err != nil {
                 log.Println(err)
             }
-            defer resp.Body.Close()
+            // defer resp.Body.Close()
 
             // On successful API call
             if resp.StatusCode == 200 {
