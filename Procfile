@@ -1,1 +1,1 @@
-worker: go bin/DinGo
+worker: bin/DinGo
