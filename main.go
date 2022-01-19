@@ -2,7 +2,10 @@ package main
 
 import (
 	//"flag"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"os"
 	"os/signal"
 	"strings"
@@ -18,11 +21,15 @@ var (
 )
 
 func init() {
+    // Initialize environment
+
     //flag.StringVar(&token, "t", "", "Bot Token")
     //flag.Parse()
 
     // Load dotenv into environment
-    godotenv.Load() 
+    godotenv.Load()
+
+    // Initialize command functions
 }
 
 func main() {
@@ -69,10 +76,71 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
     
     // Define bot prefix
-    PREFIX := "!sd"
-    
+    PREFIX := ";; "   
+
     // Check for command prefix
     if strings.HasPrefix(m.Content, PREFIX) {
-        s.ChannelMessageSend(m.ChannelID, "Working")
+
+        // Divide message
+        message := strings.Fields(m.Content)
+
+        // Switch case for command functions
+        switch message[1] {
+        case "chicken":
+            s.ChannelMessageSend(m.ChannelID, "https://tenor.com/view/chicken-gif-19565842")
+        case "iplookup":
+
+            // Prompt for IP address/hostname if not provided
+            if message[2] == "" {
+                s.ChannelMessageSend(m.ChannelID, "Please provide an IP address/hostname.")
+            }
+
+            // Make API call for JSON data
+            resp, err := http.Get("http://ipwhois.app/json/" + message[2])
+
+            if err != nil {
+                fmt.Println(err)
+            }
+            defer resp.Body.Close()
+
+            // On successful API call
+            if resp.StatusCode == 200 {
+                type Response struct {
+                    ISP         string  `json:"isp"`
+                    Country     string  `json:"country"`
+                    Region      string  `json:"region"`
+                    City        string  `json:"city"`
+                    Timezone    string  `json:"timezone"`
+                    GMTOffset   string  `json:"timezone_gmt"`
+                } 
+                
+                body, _ := ioutil.ReadAll(resp.Body)
+
+                var f Response
+
+                err := json.Unmarshal(body, &f)
+                if err != nil {
+                    fmt.Println(err)
+                }
+
+                if err != nil {
+                    fmt.Println(err)
+                }
+
+                embed := &discordgo.MessageEmbed {
+                    Color: 0xff1100, // Red
+                    Title: "IP lookup results for " + message[2],
+                    Description: fmt.Sprintf("ISP: %s\nCountry: %s\nRegion: %s\nCity: %s\nTimezone: %s\nGMT-Offset: %s", f.ISP, f.Country, f.Region, f.City, f.Timezone, f.GMTOffset),
+                }
+
+                s.ChannelMessageSendEmbed(m.ChannelID, embed)
+
+            } else {
+                fmt.Println("Received HTTP status code:", resp.StatusCode)
+            }
+
+        default:
+            s.ChannelMessageSend(m.ChannelID, "Command not found.")
+        }
     }
 }
