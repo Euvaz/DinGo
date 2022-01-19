@@ -1,0 +1,10 @@
+{
+    "comment": "",
+    "ignore": "test",
+    "package": [],
+    "rootPath": "github.com/Euvaz/DinGo",
+    "heroku": {
+        "install" : ["./..."],
+        "goVersion": "go1.17"
+    }
+}
