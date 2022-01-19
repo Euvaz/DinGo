@@ -91,8 +91,9 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
         case "iplookup":
 
             // Prompt for IP address/hostname if not provided
-            if message[2] == "" {
+            if len(message) <= 2 {
                 s.ChannelMessageSend(m.ChannelID, "Please provide an IP address/hostname.")
+                return
             }
 
             // Make API call for JSON data
