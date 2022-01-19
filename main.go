@@ -28,29 +28,12 @@ func init() {
 }
 
 func main() {
-    // Load environment variables
-    TOKEN := os.Getenv("DISCORD_TOKEN")
     os.Getenv("PORT")
+    
+    log.Println("Starting")
 
-	// Create a new Discord session using the provided bot token.
-	dg, err := discordgo.New("Bot " + TOKEN)
-	if err != nil {
-		log.Println("error creating Discord session,", err)
-		return
-	}
-
-	// Register the messageCreate func as a callback for MessageCreate events.
-	dg.AddHandler(messageCreate)
-
-	// In this example, we only care about receiving message events.
-	dg.Identify.Intents = discordgo.IntentsGuildMessages
-
-	// Open a websocket connection to Discord and begin listening.
-	err = dg.Open()
-	if err != nil {
-		log.Println("error opening connection,", err)
-		return
-	}
+    dcSession := initializeDiscord()
+    log.Println("Discord handlers added")
 
 	// Wait here until CTRL-C or other term signal is received.
 	fmt.Println("Bot is now running. Press CTRL-C to exit.")
@@ -59,12 +42,51 @@ func main() {
 	<-sc
 
 	// Cleanly close down the Discord session.
-	dg.Close()
+    handlePanic(dcSession.Close())
 }
 
-// This function will be called (due to AddHandler above) every time a new
-// message is created on any channel that the authenticated bot has access to.
-func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
+// General types and functions
+func initializeLogging() *os.File {
+	log.SetFlags(log.Ltime | log.Lshortfile)
+	logFilename := "logs.txt"
+	if os.Getenv("DYNO") != "" {
+		logFilename = "/tmp/logs.txt"
+	}
+	file, err := os.OpenFile(logFilename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+	if err != nil {
+		panic(err)
+	}
+	log.SetOutput(file)
+	return file
+}
+
+func initializeDiscord() *discordgo.Session {
+    var err error
+
+    // Load Discord Token
+    TOKEN:= os.Getenv("DISCORD_TOKEN")
+    handlePanic(err)
+
+    // Create a new Discord session using the provided token
+    dcSession, err := discordgo.New("Bot " + TOKEN)
+    handlePanic(err)
+
+    dcSession.AddHandler(dcOnMessageCreate)
+    // dcSession.AddHandler(dcOnChannelDelete)
+
+    // Open a websocket connection to Discord and begin listening
+    err = dcSession.Open()
+    handlePanic(err)
+    
+	dcSession.Identify.Intents = discordgo.IntentsGuildMessages
+
+    //guild, err = dcSession.Guild(dcSession.GuildID)
+	//handlePanic(err)
+
+    return dcSession
+}
+
+func dcOnMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	// Ignore all messages created by the bot itself
 	if m.Author.ID == s.State.User.ID {
@@ -138,5 +160,11 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
         default:
             s.ChannelMessageSend(m.ChannelID, "Command not found.")
         }
+    }
+}
+
+func handlePanic(err error) {
+    if err != nil {
+        panic(err)
     }
 }
