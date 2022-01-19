@@ -1,6 +1,6 @@
-# Gost
+# DinGo
 
-Gost is an in-progress bot-rewrite of Squiddie, which will be written in Go instead of Python due to the discontinuation of `discord.py`.
+DinGo is an in-progress bot-rewrite of Squiddie, which will be written in Go instead of Python due to the discontinuation of `discord.py`.
 
 ## LICENSE
 
