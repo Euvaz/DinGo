@@ -1,7 +1,6 @@
 package main
 
 import (
-	//"flag"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -10,6 +9,7 @@ import (
 	"os/signal"
 	"strings"
 	"syscall"
+    "log"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/joho/godotenv"
@@ -23,13 +23,8 @@ var (
 func init() {
     // Initialize environment
 
-    //flag.StringVar(&token, "t", "", "Bot Token")
-    //flag.Parse()
-
     // Load dotenv into environment
     godotenv.Load()
-
-    // Initialize command functions
 }
 
 func main() {
@@ -39,7 +34,7 @@ func main() {
 	// Create a new Discord session using the provided bot token.
 	dg, err := discordgo.New("Bot " + token)
 	if err != nil {
-		fmt.Println("error creating Discord session,", err)
+		log.Println("error creating Discord session,", err)
 		return
 	}
 
@@ -52,7 +47,7 @@ func main() {
 	// Open a websocket connection to Discord and begin listening.
 	err = dg.Open()
 	if err != nil {
-		fmt.Println("error opening connection,", err)
+		log.Println("error opening connection,", err)
 		return
 	}
 
@@ -100,7 +95,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
             resp, err := http.Get("http://ipwhois.app/json/" + message[2])
 
             if err != nil {
-                fmt.Println(err)
+                log.Println(err)
             }
             defer resp.Body.Close()
 
@@ -121,11 +116,11 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
                 err := json.Unmarshal(body, &f)
                 if err != nil {
-                    fmt.Println(err)
+                    log.Println(err)
                 }
 
                 if err != nil {
-                    fmt.Println(err)
+                    log.Println(err)
                 }
 
                 embed := &discordgo.MessageEmbed {
@@ -137,9 +132,9 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
                 s.ChannelMessageSendEmbed(m.ChannelID, embed)
 
             } else {
-                fmt.Println("Received HTTP status code:", resp.StatusCode)
+                log.Println("Received HTTP status code:", resp.StatusCode)
             }
-
+        case "":
         default:
             s.ChannelMessageSend(m.ChannelID, "Command not found.")
         }
