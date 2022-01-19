@@ -23,8 +23,6 @@ var (
 
 func init() {
     // Initialize environment
-
-    // Load dotenv into environment
     godotenv.Load()
 }
 
