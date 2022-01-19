@@ -17,7 +17,7 @@ import (
 
 // Variables used for command line parameters
 var (
-	token string
+	TOKEN string
 )
 
 func init() {
@@ -29,10 +29,10 @@ func init() {
 
 func main() {
     // Load discord token
-    token := os.Getenv("DISCORD_TOKEN")
+    TOKEN := os.Getenv("DISCORD_TOKEN")
 
 	// Create a new Discord session using the provided bot token.
-	dg, err := discordgo.New("Bot " + token)
+	dg, err := discordgo.New("Bot " + TOKEN)
 	if err != nil {
 		log.Println("error creating Discord session,", err)
 		return
@@ -71,7 +71,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
     
     // Define bot prefix
-    PREFIX := "$ "   
+    PREFIX := os.Getenv("PREFIX")
 
     // Check for command prefix
     if strings.HasPrefix(m.Content, PREFIX) {
