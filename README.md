@@ -3,6 +3,7 @@
 DinGo is an in-progress bot-rewrite of Squiddie, which will be written in Go instead of Python due to the discontinuation of `discord.py`.
 
 ## Usage
+This project assumes that Go is both installed, and added to your system's PATH.
 
 ### Inline
 DinGo can be ran inline via the following:
