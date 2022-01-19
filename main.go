@@ -28,8 +28,9 @@ func init() {
 }
 
 func main() {
-    // Load discord token
+    // Load environment variables
     TOKEN := os.Getenv("DISCORD_TOKEN")
+    os.Getenv("PORT")
 
 	// Create a new Discord session using the provided bot token.
 	dg, err := discordgo.New("Bot " + TOKEN)
