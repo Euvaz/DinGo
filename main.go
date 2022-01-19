@@ -32,7 +32,7 @@ func main() {
     PORT := os.Getenv("PORT")
 
     if PORT == "" {
-        log.Println("PORT not set")
+        log.Println("$PORT not found within environment")
     }
     
     log.Println("Starting")
