@@ -1,6 +1,6 @@
 # DinGo
 
-DinGo is an in-progress bot-rewrite of Squiddie, which will be written in Go instead of Python due to the discontinuation of `discord.py`.
+DinGo is an in-progress bot-rewrite of [Squiddie](https://github.com/Euvaz/Squiddie), which will be written in Go instead of Python due to the discontinuation of `discord.py`.
 
 ## Usage
 This project assumes that Go is both installed, and added to your system's PATH.
@@ -15,8 +15,7 @@ A binary can also be generated in order for faster execution times:
 
 `go build main.go`
 
-This will result in a `main` executable file being created.
-
+This will result in a `main` executable file being created, with the filetype dependent upon the system which the executable was generated.
 
 ## LICENSE
 
