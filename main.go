@@ -17,7 +17,8 @@ import (
 
 // Variables used for command line parameters
 var (
-	TOKEN string
+	TOKEN   string
+    PORT    int
 )
 
 func init() {
@@ -28,7 +29,11 @@ func init() {
 }
 
 func main() {
-    os.Getenv("PORT")
+    PORT := os.Getenv("PORT")
+
+    if PORT == "" {
+        log.Println("PORT not set")
+    }
     
     log.Println("Starting")
 
