@@ -71,7 +71,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
     
     // Define bot prefix
-    PREFIX := ";; "   
+    PREFIX := "$ "   
 
     // Check for command prefix
     if strings.HasPrefix(m.Content, PREFIX) {
@@ -134,7 +134,6 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
             } else {
                 log.Println("Received HTTP status code:", resp.StatusCode)
             }
-        case "":
         default:
             s.ChannelMessageSend(m.ChannelID, "Command not found.")
         }
