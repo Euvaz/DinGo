@@ -146,20 +146,19 @@ func dcCommandIPLookup(command []string, s *discordgo.Session, m *discordgo.Mess
         } 
                 
         body, _ := ioutil.ReadAll(resp.Body)
-
         var f Response
-
         err := json.Unmarshal(body, &f)
         handlePanic(err)
 
+        // Generate Discord embed
         embed := &discordgo.MessageEmbed {
             Color: 0xff1100, // Red
             Title: "IP lookup results for " + command[2],
             Description: fmt.Sprintf("ISP: %s\nCountry: %s\nRegion: %s\nCity: %s\nTimezone: %s\nGMT-Offset: %s", f.ISP, f.Country, f.Region, f.City, f.Timezone, f.GMTOffset),
         }
 
+        // Send Discord embed
         s.ChannelMessageSendEmbed(m.ChannelID, embed)
-
     } else {
         log.Println("Received HTTP status code:", resp.StatusCode)
     }
