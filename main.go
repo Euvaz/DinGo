@@ -10,6 +10,7 @@ import (
 	"strings"
 	"syscall"
     "log"
+    "time"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/joho/godotenv"
@@ -106,8 +107,17 @@ func dcOnMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
             dcCommandSosig(command, s, m)
         case "iplookup":
             dcCommandIPLookup(command, s, m)
+        case "lbar":
+            dcCommandLBar(command, s, m)
         default:
-            s.ChannelMessageSend(m.ChannelID, "Command not found.")
+            // Generate Discord embed
+            embed := &discordgo.MessageEmbed {
+            Color: 0xff1100, // Red
+            Title: fmt.Sprintf("Command \"%s\" not found", command[1]),
+            Description: fmt.Sprintf("Type \"%s help\" for a list of available commands", PREFIX),
+        }
+            // Send Discord embed
+            s.ChannelMessageSendEmbed(m.ChannelID, embed)
         }
     }
 }
@@ -162,6 +172,19 @@ func dcCommandIPLookup(command []string, s *discordgo.Session, m *discordgo.Mess
     } else {
         log.Println("Received HTTP status code:", resp.StatusCode)
     }
+}
+
+func dcCommandLBar(command []string, s *discordgo.Session, m *discordgo.MessageCreate) {
+    message, err := s.ChannelMessageSend(m.ChannelID, "Loading...\n[]")
+    handlePanic(err)
+
+    // Send an empty bar and edit the message to "load"
+    for i := 1; i <= 10; i++ {
+        s.ChannelMessageEdit(m.ChannelID, message.ID, fmt.Sprintf("Loading...\n[%s] %d0/100", strings.Repeat("#", i), i))
+        time.Sleep(time.Second)
+    }
+    // Send message on completion
+    s.ChannelMessageSend(m.ChannelID, "Complete!")
 }
 
 func handlePanic(err error) {
