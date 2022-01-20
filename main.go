@@ -108,11 +108,12 @@ func dcOnMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
         // Switch case for command functions
         switch message[1] {
         case "chicken":
+            // Posts an image of TF2 Scout turning into a chicken
             s.ChannelMessageSend(m.ChannelID, "https://tenor.com/view/chicken-gif-19565842")
         case "sosig":
+            // Posts an image of a man doing "tricks" with a sausage
             s.ChannelMessageSend(m.ChannelID, "https://tenor.com/view/sosig-gif-23013003")
         case "iplookup":
-
             // Prompt for IP address/hostname if not provided
             if len(message) <= 2 {
                 s.ChannelMessageSend(m.ChannelID, "Please provide an IP address/hostname.")
