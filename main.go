@@ -75,7 +75,6 @@ func initializeDiscord() *discordgo.Session {
     handlePanic(err)
 
     dcSession.AddHandler(dcOnMessageCreate)
-    // dcSession.AddHandler(dcOnChannelDelete)
 
     // Open a websocket connection to Discord and begin listening
     err = dcSession.Open()
