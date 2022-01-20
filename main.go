@@ -128,13 +128,10 @@ func dcCommandIPLookup(command []string, s *discordgo.Session, m *discordgo.Mess
         s.ChannelMessageSend(m.ChannelID, "Please provide an IP address/hostname.")
         return
     }
-
     // Make API call for JSON data
     resp, err := http.Get("http://ipwhois.app/json/" + command[2])
-
-    if err != nil {
-        log.Println(err)
-    }
+    handlePanic(err)
+    
     defer resp.Body.Close()
 
     // On successful API call
@@ -153,13 +150,7 @@ func dcCommandIPLookup(command []string, s *discordgo.Session, m *discordgo.Mess
         var f Response
 
         err := json.Unmarshal(body, &f)
-        if err != nil {
-            log.Println(err)
-        }
-
-        if err != nil {
-            log.Println(err)
-        }
+        handlePanic(err)
 
         embed := &discordgo.MessageEmbed {
             Color: 0xff1100, // Red
