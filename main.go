@@ -175,14 +175,23 @@ func dcCommandIPLookup(command []string, s *discordgo.Session, m *discordgo.Mess
 }
 
 func dcCommandLBar(command []string, s *discordgo.Session, m *discordgo.MessageCreate) {
+    // Define barTitle variable
+    barTitle := ""
+    // Default to "" if no extra arguments are passed
+    if len(command) <= 2 {
+        barTitle = ""
+    } else {
+        barTitle = fmt.Sprintf("%s\n", strings.Join(command[2:], " "))
+    }
+
     // Send initial message
-    message, err := s.ChannelMessageSend(m.ChannelID, "[]")
+    message, err := s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%s[%s] 0%%", barTitle, strings.Repeat("-", 10)))
     handlePanic(err)
 
     // Send an empty bar and edit the message to "load"
     for i := 1; i <= 10; i++ {
         time.Sleep(time.Second)
-        s.ChannelMessageEdit(m.ChannelID, message.ID, fmt.Sprintf("[%s] %d0%%", strings.Repeat("#", i), i))
+        s.ChannelMessageEdit(m.ChannelID, message.ID, fmt.Sprintf("%s[%s%s] %d0%%", barTitle, strings.Repeat("#", i), strings.Repeat("-", 10 - i), i))
     }
 }
 
