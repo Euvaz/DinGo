@@ -175,16 +175,15 @@ func dcCommandIPLookup(command []string, s *discordgo.Session, m *discordgo.Mess
 }
 
 func dcCommandLBar(command []string, s *discordgo.Session, m *discordgo.MessageCreate) {
-    message, err := s.ChannelMessageSend(m.ChannelID, "Loading...\n[]")
+    // Send initial message
+    message, err := s.ChannelMessageSend(m.ChannelID, "[]")
     handlePanic(err)
 
     // Send an empty bar and edit the message to "load"
     for i := 1; i <= 10; i++ {
-        s.ChannelMessageEdit(m.ChannelID, message.ID, fmt.Sprintf("Loading...\n[%s] %d0/100", strings.Repeat("#", i), i))
         time.Sleep(time.Second)
+        s.ChannelMessageEdit(m.ChannelID, message.ID, fmt.Sprintf("[%s] %d0%%", strings.Repeat("#", i), i))
     }
-    // Send message on completion
-    s.ChannelMessageSend(m.ChannelID, "Complete!")
 }
 
 func handlePanic(err error) {
