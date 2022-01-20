@@ -82,9 +82,6 @@ func initializeDiscord() *discordgo.Session {
     
 	dcSession.Identify.Intents = discordgo.IntentsGuildMessages
 
-    //guild, err = dcSession.Guild(dcSession.GuildID)
-	//handlePanic(err)
-
     return dcSession
 }
 
