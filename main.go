@@ -75,16 +75,12 @@ func initializeDiscord() *discordgo.Session {
     handlePanic(err)
 
     dcSession.AddHandler(dcOnMessageCreate)
-    // dcSession.AddHandler(dcOnChannelDelete)
 
     // Open a websocket connection to Discord and begin listening
     err = dcSession.Open()
     handlePanic(err)
     
 	dcSession.Identify.Intents = discordgo.IntentsGuildMessages
-
-    //guild, err = dcSession.Guild(dcSession.GuildID)
-	//handlePanic(err)
 
     return dcSession
 }
@@ -102,69 +98,69 @@ func dcOnMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
     // Check for command prefix
     if strings.HasPrefix(m.Content, PREFIX) {
 
-        // Divide message
-        message := strings.Fields(m.Content)
-
         // Switch case for command functions
-        switch message[1] {
+        switch command := strings.Fields(m.Content); strings.ToLower(command[1]) {
         case "chicken":
-            s.ChannelMessageSend(m.ChannelID, "https://tenor.com/view/chicken-gif-19565842")
+            dcCommandChicken(command, s, m)
         case "sosig":
-            s.ChannelMessageSend(m.ChannelID, "https://tenor.com/view/sosig-gif-23013003")
+            dcCommandSosig(command, s, m)
         case "iplookup":
-
-            // Prompt for IP address/hostname if not provided
-            if len(message) <= 2 {
-                s.ChannelMessageSend(m.ChannelID, "Please provide an IP address/hostname.")
-                return
-            }
-
-            // Make API call for JSON data
-            resp, err := http.Get("http://ipwhois.app/json/" + message[2])
-
-            if err != nil {
-                log.Println(err)
-            }
-            defer resp.Body.Close()
-
-            // On successful API call
-            if resp.StatusCode == 200 {
-                type Response struct {
-                    ISP         string  `json:"isp"`
-                    Country     string  `json:"country"`
-                    Region      string  `json:"region"`
-                    City        string  `json:"city"`
-                    Timezone    string  `json:"timezone"`
-                    GMTOffset   string  `json:"timezone_gmt"`
-                } 
-                
-                body, _ := ioutil.ReadAll(resp.Body)
-
-                var f Response
-
-                err := json.Unmarshal(body, &f)
-                if err != nil {
-                    log.Println(err)
-                }
-
-                if err != nil {
-                    log.Println(err)
-                }
-
-                embed := &discordgo.MessageEmbed {
-                    Color: 0xff1100, // Red
-                    Title: "IP lookup results for " + message[2],
-                    Description: fmt.Sprintf("ISP: %s\nCountry: %s\nRegion: %s\nCity: %s\nTimezone: %s\nGMT-Offset: %s", f.ISP, f.Country, f.Region, f.City, f.Timezone, f.GMTOffset),
-                }
-
-                s.ChannelMessageSendEmbed(m.ChannelID, embed)
-
-            } else {
-                log.Println("Received HTTP status code:", resp.StatusCode)
-            }
+            dcCommandIPLookup(command, s, m)
         default:
             s.ChannelMessageSend(m.ChannelID, "Command not found.")
         }
+    }
+}
+
+func dcCommandChicken(command []string, s *discordgo.Session, m *discordgo.MessageCreate) {
+    // Posts an image of TF2 Scout turning into a chicken
+    s.ChannelMessageSend(m.ChannelID, "https://tenor.com/view/chicken-gif-19565842")
+}
+
+func dcCommandSosig(command []string, s *discordgo.Session, m *discordgo.MessageCreate) {
+    // Posts an image of a man doing "tricks" with a sausage
+    s.ChannelMessageSend(m.ChannelID, "https://tenor.com/view/sosig-gif-23013003")
+}
+
+func dcCommandIPLookup(command []string, s *discordgo.Session, m *discordgo.MessageCreate) {
+    // Prompt for IP address/hostname if not provided
+    if len(command) <= 2 {
+        s.ChannelMessageSend(m.ChannelID, "Please provide an IP address/hostname.")
+        return
+    }
+    // Make API call for JSON data
+    resp, err := http.Get("http://ipwhois.app/json/" + command[2])
+    handlePanic(err)
+    
+    defer resp.Body.Close()
+
+    // On successful API call
+    if resp.StatusCode == 200 {
+        type Response struct {
+            ISP         string  `json:"isp"`
+            Country     string  `json:"country"`
+            Region      string  `json:"region"`
+            City        string  `json:"city"`
+            Timezone    string  `json:"timezone"`
+            GMTOffset   string  `json:"timezone_gmt"`
+        } 
+                
+        body, _ := ioutil.ReadAll(resp.Body)
+        var f Response
+        err := json.Unmarshal(body, &f)
+        handlePanic(err)
+
+        // Generate Discord embed
+        embed := &discordgo.MessageEmbed {
+            Color: 0xff1100, // Red
+            Title: "IP lookup results for " + command[2],
+            Description: fmt.Sprintf("ISP: %s\nCountry: %s\nRegion: %s\nCity: %s\nTimezone: %s\nGMT-Offset: %s", f.ISP, f.Country, f.Region, f.City, f.Timezone, f.GMTOffset),
+        }
+
+        // Send Discord embed
+        s.ChannelMessageSendEmbed(m.ChannelID, embed)
+    } else {
+        log.Println("Received HTTP status code:", resp.StatusCode)
     }
 }
 
