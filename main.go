@@ -109,6 +109,8 @@ func dcOnMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
         switch message[1] {
         case "chicken":
             s.ChannelMessageSend(m.ChannelID, "https://tenor.com/view/chicken-gif-19565842")
+        case "sosig":
+            s.ChannelMessageSend(m.ChannelID, "https://tenor.com/view/sosig-gif-23013003")
         case "iplookup":
 
             // Prompt for IP address/hostname if not provided
