@@ -102,11 +102,8 @@ func dcOnMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
     // Check for command prefix
     if strings.HasPrefix(m.Content, PREFIX) {
 
-        // Divide message
-        message := strings.Fields(m.Content)
-
         // Switch case for command functions
-        switch message[1] {
+        switch command := strings.Fields(m.Content); strings.ToLower(command[1]) {
         case "chicken":
             // Posts an image of TF2 Scout turning into a chicken
             s.ChannelMessageSend(m.ChannelID, "https://tenor.com/view/chicken-gif-19565842")
@@ -115,13 +112,13 @@ func dcOnMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
             s.ChannelMessageSend(m.ChannelID, "https://tenor.com/view/sosig-gif-23013003")
         case "iplookup":
             // Prompt for IP address/hostname if not provided
-            if len(message) <= 2 {
+            if len(command) <= 2 {
                 s.ChannelMessageSend(m.ChannelID, "Please provide an IP address/hostname.")
                 return
             }
 
             // Make API call for JSON data
-            resp, err := http.Get("http://ipwhois.app/json/" + message[2])
+            resp, err := http.Get("http://ipwhois.app/json/" + command[2])
 
             if err != nil {
                 log.Println(err)
@@ -154,7 +151,7 @@ func dcOnMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
                 embed := &discordgo.MessageEmbed {
                     Color: 0xff1100, // Red
-                    Title: "IP lookup results for " + message[2],
+                    Title: "IP lookup results for " + command[2],
                     Description: fmt.Sprintf("ISP: %s\nCountry: %s\nRegion: %s\nCity: %s\nTimezone: %s\nGMT-Offset: %s", f.ISP, f.Country, f.Region, f.City, f.Timezone, f.GMTOffset),
                 }
 
