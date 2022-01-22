@@ -111,6 +111,8 @@ func dcOnMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
             dcCommandLBar(command, s, m)
         case "fumo":
             dcCommandFumo(command, s, m)
+        case "help":
+            dcCommandHelp(command, s, m)
         default:
             // Generate Discord embed
             embed := &discordgo.MessageEmbed{
@@ -226,6 +228,10 @@ func dcCommandLBar(command []string, s *discordgo.Session, m *discordgo.MessageC
         time.Sleep(time.Second)
         s.ChannelMessageEdit(m.ChannelID, message.ID, fmt.Sprintf("%s[%s%s] %d0%%", barTitle, strings.Repeat("#", i), strings.Repeat("-", 10-i), i))
     }
+}
+
+func dcCommandHelp(command []string, s *discordgo.Session, m *discordgo.MessageCreate) {
+
 }
 
 func handlePanic(err error) {
