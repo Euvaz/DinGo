@@ -1,24 +1,24 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"net/http"
-	"os"
-	"os/signal"
-	"strings"
-	"syscall"
+    "encoding/json"
+    "fmt"
+    "io/ioutil"
+    "net/http"
+    "os"
+    "os/signal"
+    "strings"
+    "syscall"
     "log"
     "time"
 
-	"github.com/bwmarrin/discordgo"
-	"github.com/joho/godotenv"
+    "github.com/bwmarrin/discordgo"
+    "github.com/joho/godotenv"
 )
 
 // Variables used for command line parameters
 var (
-	TOKEN   string
+    TOKEN   string
     PORT    int
 )
 
@@ -45,7 +45,7 @@ func main() {
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	<-sc
 
-	// Cleanly close down the Discord session.
+    // Cleanly close down the Discord session.
     handlePanic(dcSession.Close())
 }
 
@@ -80,19 +80,19 @@ func initializeDiscord() *discordgo.Session {
     // Open a websocket connection to Discord and begin listening
     err = dcSession.Open()
     handlePanic(err)
-    
-	dcSession.Identify.Intents = discordgo.IntentsGuildMessages
+
+    dcSession.Identify.Intents = discordgo.IntentsGuildMessages
 
     return dcSession
 }
 
 func dcOnMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
-	// Ignore all messages created by the bot itself
-	if m.Author.ID == s.State.User.ID {
-		return
-	}
-    
+    // Ignore all messages created by the bot itself
+    if m.Author.ID == s.State.User.ID {
+        return
+    }
+
     // Define bot prefix
     PREFIX := os.Getenv("PREFIX")
 
@@ -177,7 +177,6 @@ func dcCommandIPLookup(command []string, s *discordgo.Session, m *discordgo.Mess
 func dcCommandLBar(command []string, s *discordgo.Session, m *discordgo.MessageCreate) {
     // Define barTitle variable
     barTitle := ""
-    // Default to "" if no extra arguments are passed
     if len(command) == 2 {
         barTitle = ""
     } else if len(command) >= 3 && len(command) <= 7 {
