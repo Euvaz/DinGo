@@ -227,7 +227,7 @@ func dcCommandFumo(command []string, s *discordgo.Session, m *discordgo.MessageC
         err := json.Unmarshal(body, &f)
         handlePanic(err)
 
-        // Send fumo image
+        // Send random image of fumo
         s.ChannelMessageSend(m.ChannelID, f.URL)
     } else {
         log.Println("Received HTTP status code:", resp.StatusCode)
