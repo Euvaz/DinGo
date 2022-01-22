@@ -81,6 +81,10 @@ func initializeDiscord() *discordgo.Session {
 	err = dcSession.Open()
 	handlePanic(err)
 
+	// Open a websocket connection to Discord and begin listening
+	err = dcSession.Open()
+	handlePanic(err)
+
 	dcSession.Identify.Intents = discordgo.IntentsGuildMessages
 
 	return dcSession
@@ -109,8 +113,6 @@ func dcOnMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			dcCommandIPLookup(command, s, m)
 		case "lbar":
 			dcCommandLBar(command, s, m)
-		case "fumo":
-			dcCommandFumo(command, s, m)
 		default:
 			// Generate Discord embed
 			embed := &discordgo.MessageEmbed{
@@ -179,7 +181,6 @@ func dcCommandIPLookup(command []string, s *discordgo.Session, m *discordgo.Mess
 func dcCommandLBar(command []string, s *discordgo.Session, m *discordgo.MessageCreate) {
 	// Define barTitle variable
 	barTitle := ""
-	// Default to "" if no extra arguments are passed
 	if len(command) == 2 {
 		barTitle = ""
 	} else if len(command) >= 3 && len(command) <= 7 {
@@ -204,29 +205,6 @@ func dcCommandLBar(command []string, s *discordgo.Session, m *discordgo.MessageC
 		time.Sleep(time.Second)
 		s.ChannelMessageEdit(m.ChannelID, message.ID, fmt.Sprintf("%s[%s%s] %d0%%", barTitle, strings.Repeat("#", i), strings.Repeat("-", 10-i), i))
 	}
-}
-
-func dcCommandFumo(command []string, s *discordgo.Session, m *discordgo.MessageCreate) {
-	resp, err := http.Get("http://fumoapi.herokuapp.com/random")
-	handlePanic(err)
-
-	defer resp.Body.Close()
-
-	if resp.StatusCode == 200 {
-		type Response struct {
-			URL string `json:"url"`
-		}
-
-		body, _ := ioutil.ReadAll(resp.Body)
-		var f Response
-		err := json.Unmarshal(body, &f)
-		handlePanic(err)
-
-		s.ChannelMessageSend(m.ChannelID, f.URL)
-	} else {
-		log.Println("Received HTTP status code:", resp.StatusCode)
-	}
-
 }
 
 func dcCommandCommit(command []string, s *discordgo.Session, m *discordgo.MessageCreate) {
