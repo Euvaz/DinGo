@@ -234,11 +234,6 @@ func dcCommandFumo(command []string, s *discordgo.Session, m *discordgo.MessageC
     }
 }
 
-func dcCommandCommit(command []string, s *discordgo.Session, m *discordgo.MessageCreate) {
-    // Configure a webhook
-    s.ChannelMessageSend(m.ChannelID, "")
-}
-
 func handlePanic(err error) {
     if err != nil {
         panic(err)
