@@ -4,12 +4,12 @@ import (
     "encoding/json"
     "fmt"
     "io/ioutil"
+    "log"
     "net/http"
     "os"
     "os/signal"
     "strings"
     "syscall"
-    "log"
     "time"
 
     "github.com/bwmarrin/discordgo"
@@ -33,7 +33,7 @@ func main() {
     if PORT == "" {
         log.Println("$PORT not found within environment")
     }
-    
+
     log.Println("Starting")
 
     dcSession := initializeDiscord()
@@ -68,7 +68,7 @@ func initializeDiscord() *discordgo.Session {
     var err error
 
     // Load Discord Token
-    TOKEN:= os.Getenv("DISCORD_TOKEN")
+    TOKEN := os.Getenv("DISCORD_TOKEN")
     handlePanic(err)
 
     // Create a new Discord session using the provided token
@@ -80,7 +80,7 @@ func initializeDiscord() *discordgo.Session {
     // Open a websocket connection to Discord and begin listening
     err = dcSession.Open()
     handlePanic(err)
-    
+
     dcSession.Identify.Intents = discordgo.IntentsGuildMessages
 
     return dcSession
@@ -92,7 +92,7 @@ func dcOnMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
     if m.Author.ID == s.State.User.ID {
         return
     }
-    
+
     // Define bot prefix
     PREFIX := os.Getenv("PREFIX")
 
@@ -113,11 +113,11 @@ func dcOnMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
             dcCommandFumo(command, s, m)
         default:
             // Generate Discord embed
-            embed := &discordgo.MessageEmbed {
-            Color: 0xff1100, // Red
-            Title: fmt.Sprintf("Command \"%s\" not found", command[1]),
-            Description: fmt.Sprintf("Type \"%s help\" for a list of available commands", PREFIX),
-        }
+            embed := &discordgo.MessageEmbed{
+                Color:       0xff1100, // Red
+                Title:       fmt.Sprintf("Command \"%s\" not found", command[1]),
+                Description: fmt.Sprintf("Type \"%s help\" for a list of available commands", PREFIX),
+            }
             // Send Discord embed
             s.ChannelMessageSendEmbed(m.ChannelID, embed)
         }
@@ -143,29 +143,29 @@ func dcCommandIPLookup(command []string, s *discordgo.Session, m *discordgo.Mess
     // Make API call for JSON data
     resp, err := http.Get("http://ipwhois.app/json/" + command[2])
     handlePanic(err)
-    
+
     defer resp.Body.Close()
 
     // On successful API call
     if resp.StatusCode == 200 {
         type Response struct {
-            ISP         string  `json:"isp"`
-            Country     string  `json:"country"`
-            Region      string  `json:"region"`
-            City        string  `json:"city"`
-            Timezone    string  `json:"timezone"`
-            GMTOffset   string  `json:"timezone_gmt"`
-        } 
-                
+            ISP       string `json:"isp"`
+            Country   string `json:"country"`
+            Region    string `json:"region"`
+            City      string `json:"city"`
+            Timezone  string `json:"timezone"`
+            GMTOffset string `json:"timezone_gmt"`
+        }
+
         body, _ := ioutil.ReadAll(resp.Body)
         var f Response
         err := json.Unmarshal(body, &f)
         handlePanic(err)
 
         // Generate Discord embed
-        embed := &discordgo.MessageEmbed {
-            Color: 0xff1100, // Red
-            Title: "IP lookup results for " + command[2],
+        embed := &discordgo.MessageEmbed{
+            Color:       0xff1100, // Red
+            Title:       "IP lookup results for " + command[2],
             Description: fmt.Sprintf("ISP: %s\nCountry: %s\nRegion: %s\nCity: %s\nTimezone: %s\nGMT-Offset: %s", f.ISP, f.Country, f.Region, f.City, f.Timezone, f.GMTOffset),
         }
 
@@ -202,15 +202,14 @@ func dcCommandFumo(command []string, s *discordgo.Session, m *discordgo.MessageC
 func dcCommandLBar(command []string, s *discordgo.Session, m *discordgo.MessageCreate) {
     // Define barTitle variable
     barTitle := ""
-    // Default to "" if no extra arguments are passed
     if len(command) == 2 {
         barTitle = ""
     } else if len(command) >= 3 && len(command) <= 7 {
-        for i := 2; i <= len(command) - 1; i++ {
+        for i := 2; i <= len(command)-1; i++ {
             if len(command[i]) > 10 {
                 s.ChannelMessageSend(m.ChannelID, "Too many characters")
                 return
-            } 
+            }
         }
         barTitle = fmt.Sprintf("%s\n", strings.Join(command[2:], " "))
     } else {
@@ -225,12 +224,12 @@ func dcCommandLBar(command []string, s *discordgo.Session, m *discordgo.MessageC
     // Send an empty bar and edit the message to "load"
     for i := 1; i <= 10; i++ {
         time.Sleep(time.Second)
-        s.ChannelMessageEdit(m.ChannelID, message.ID, fmt.Sprintf("%s[%s%s] %d0%%", barTitle, strings.Repeat("#", i), strings.Repeat("-", 10 - i), i))
+        s.ChannelMessageEdit(m.ChannelID, message.ID, fmt.Sprintf("%s[%s%s] %d0%%", barTitle, strings.Repeat("#", i), strings.Repeat("-", 10-i), i))
     }
 }
 
 func handlePanic(err error) {
     if err != nil {
         panic(err)
-    }
+	}
 }
