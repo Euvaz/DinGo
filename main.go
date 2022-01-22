@@ -178,10 +178,19 @@ func dcCommandLBar(command []string, s *discordgo.Session, m *discordgo.MessageC
     // Define barTitle variable
     barTitle := ""
     // Default to "" if no extra arguments are passed
-    if len(command) <= 2 {
+    if len(command) == 2 {
         barTitle = ""
-    } else {
+    } else if len(command) >= 3 && len(command) <= 7 {
+        for i := 2; i <= len(command) - 1; i++ {
+            if len(command[i]) > 10 {
+                s.ChannelMessageSend(m.ChannelID, "Too many characters")
+                return
+            } 
+        }
         barTitle = fmt.Sprintf("%s\n", strings.Join(command[2:], " "))
+    } else {
+        s.ChannelMessageSend(m.ChannelID, "Message is too long")
+        return
     }
 
     // Send initial message
@@ -193,6 +202,11 @@ func dcCommandLBar(command []string, s *discordgo.Session, m *discordgo.MessageC
         time.Sleep(time.Second)
         s.ChannelMessageEdit(m.ChannelID, message.ID, fmt.Sprintf("%s[%s%s] %d0%%", barTitle, strings.Repeat("#", i), strings.Repeat("-", 10 - i), i))
     }
+}
+
+func dcCommandCommit(command []string, s *discordgo.Session, m *discordgo.MessageCreate) {
+    // Configure a webhook
+    s.ChannelMessageSend(m.ChannelID, "")
 }
 
 func handlePanic(err error) {
