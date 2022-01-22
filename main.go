@@ -109,6 +109,8 @@ func dcOnMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
             dcCommandIPLookup(command, s, m)
         case "lbar":
             dcCommandLBar(command, s, m)
+        case "fumo":
+            dcCommandFumo(command, s, m)
         default:
             // Generate Discord embed
             embed := &discordgo.MessageEmbed {
@@ -171,6 +173,29 @@ func dcCommandIPLookup(command []string, s *discordgo.Session, m *discordgo.Mess
         s.ChannelMessageSendEmbed(m.ChannelID, embed)
     } else {
         log.Println("Received HTTP status code:", resp.StatusCode)
+    }
+}
+
+func dcCommandFumo(command []string, s *discordgo.Session, m *discordgo.MessageCreate) {
+    // Make API call for JSON data
+    resp, err := http.Get("https://fumoapi.herokuapp.com/random")
+    handlePanic(err)
+
+    defer resp.Body.Close()
+
+    // On successful API call
+    if resp.StatusCode == 200 {
+        type Response struct {
+            URL     string  `json:"url"`
+        }
+
+        body, _ := ioutil.ReadAll(resp.Body)
+        var f Response
+        err := json.Unmarshal(body, &f)
+        handlePanic(err)
+
+        // Send random image of Fumo
+        s.ChannelMessageSend(m.ChannelID, f.URL)
     }
 }
 
