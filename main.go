@@ -1,24 +1,24 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"net/http"
-	"os"
-	"os/signal"
-	"strings"
-	"syscall"
+    "encoding/json"
+    "fmt"
+    "io/ioutil"
+    "net/http"
+    "os"
+    "os/signal"
+    "strings"
+    "syscall"
     "log"
     "time"
 
-	"github.com/bwmarrin/discordgo"
-	"github.com/joho/godotenv"
+    "github.com/bwmarrin/discordgo"
+    "github.com/joho/godotenv"
 )
 
 // Variables used for command line parameters
 var (
-	TOKEN   string
+    TOKEN   string
     PORT    int
 )
 
@@ -39,29 +39,29 @@ func main() {
     dcSession := initializeDiscord()
     log.Println("Discord handlers added")
 
-	// Wait here until CTRL-C or other term signal is received.
-	fmt.Println("Bot is now running. Press CTRL-C to exit.")
-	sc := make(chan os.Signal, 1)
-	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
-	<-sc
+    // Wait here until CTRL-C or other term signal is received.
+    fmt.Println("Bot is now running. Press CTRL-C to exit.")
+    sc := make(chan os.Signal, 1)
+    signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
+    <-sc
 
-	// Cleanly close down the Discord session.
+    // Cleanly close down the Discord session.
     handlePanic(dcSession.Close())
 }
 
 // General types and functions
 func initializeLogging() *os.File {
-	log.SetFlags(log.Ltime | log.Lshortfile)
-	logFilename := "logs.txt"
-	if os.Getenv("DYNO") != "" {
-		logFilename = "/tmp/logs.txt"
-	}
-	file, err := os.OpenFile(logFilename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
-	if err != nil {
-		panic(err)
-	}
-	log.SetOutput(file)
-	return file
+    log.SetFlags(log.Ltime | log.Lshortfile)
+    logFilename := "logs.txt"
+    if os.Getenv("DYNO") != "" {
+        logFilename = "/tmp/logs.txt"
+    }
+    file, err := os.OpenFile(logFilename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+    if err != nil {
+        panic(err)
+    }
+    log.SetOutput(file)
+    return file
 }
 
 func initializeDiscord() *discordgo.Session {
@@ -81,17 +81,17 @@ func initializeDiscord() *discordgo.Session {
     err = dcSession.Open()
     handlePanic(err)
     
-	dcSession.Identify.Intents = discordgo.IntentsGuildMessages
+    dcSession.Identify.Intents = discordgo.IntentsGuildMessages
 
     return dcSession
 }
 
 func dcOnMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
-	// Ignore all messages created by the bot itself
-	if m.Author.ID == s.State.User.ID {
-		return
-	}
+    // Ignore all messages created by the bot itself
+    if m.Author.ID == s.State.User.ID {
+        return
+    }
     
     // Define bot prefix
     PREFIX := os.Getenv("PREFIX")
@@ -202,11 +202,6 @@ func dcCommandLBar(command []string, s *discordgo.Session, m *discordgo.MessageC
         time.Sleep(time.Second)
         s.ChannelMessageEdit(m.ChannelID, message.ID, fmt.Sprintf("%s[%s%s] %d0%%", barTitle, strings.Repeat("#", i), strings.Repeat("-", 10 - i), i))
     }
-}
-
-func dcCommandCommit(command []string, s *discordgo.Session, m *discordgo.MessageCreate) {
-    // Configure a webhook
-    s.ChannelMessageSend(m.ChannelID, "")
 }
 
 func handlePanic(err error) {
