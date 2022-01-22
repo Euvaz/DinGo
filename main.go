@@ -210,11 +210,13 @@ func dcCommandLBar(command []string, s *discordgo.Session, m *discordgo.MessageC
 }
 
 func dcCommandFumo(command []string, s *discordgo.Session, m *discordgo.MessageCreate) {
+	// Make API call for JSON data
 	resp, err := http.Get("http://fumoapi.herokuapp.com/random")
 	handlePanic(err)
 
 	defer resp.Body.Close()
 
+	// On successful API call
 	if resp.StatusCode == 200 {
 		type Response struct {
 			URL string `json:"url"`
@@ -225,6 +227,7 @@ func dcCommandFumo(command []string, s *discordgo.Session, m *discordgo.MessageC
 		err := json.Unmarshal(body, &f)
 		handlePanic(err)
 
+		// Send fumo image
 		s.ChannelMessageSend(m.ChannelID, f.URL)
 	} else {
 		log.Println("Received HTTP status code:", resp.StatusCode)
