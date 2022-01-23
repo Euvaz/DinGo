@@ -231,11 +231,36 @@ func dcCommandLBar(command []string, s *discordgo.Session, m *discordgo.MessageC
 }
 
 func dcCommandHelp(command []string, s *discordgo.Session, m *discordgo.MessageCreate) {
+    commands := [][]string {
+        {"Chicken", "Posts an image of TF2 Scout turning into a chicken", ""},
+        {"Sosig", "Posts a gif of a man doing tricks with a sausage", ""},
+        {"IPLookup", "Replies with information of the IP given to it", ""},
+        {"Fumo", "Posts a random image of a fumo", ""},
+        {"LBar", "Sends a 10 second loading bar with the given title", ""},
+    }
+    if len(command) == 2 {
+        message := []string{}
+        for i := 0; i < len(commands)-1; i++ {
+            s := []string{commands[i][0], commands[i][1]}
+            t := strings.Join(s, " - ")
+            message = append(message, t)
+        }
+        embed := &discordgo.MessageEmbed{
+            Color:       0xff1100, // Red
+            Title:       "Available Commands",
+            Description: fmt.Sprintf(strings.Join(message, "\n")),
+        }
+        s.ChannelMessageSendEmbed(m.ChannelID, embed)
+    } else if len(command) == 3 {
+        
+    } else {
+        // im slow im sorry IM READING DOCS -_-
+    }
 
 }
 
 func handlePanic(err error) {
     if err != nil {
         panic(err)
-	}
+    }
 }
