@@ -165,7 +165,7 @@ func dcCommandIPLookup(command []string, s *discordgo.Session, m *discordgo.Mess
         handlePanic(err)
 
         // Generate Discord embed
-        embed := &discordgo.MessageEmbed{
+        embed := &discordgo.MessageEmbed {
             Color:       0xff1100, // Red
             Title:       "IP lookup results for " + command[2],
             Description: fmt.Sprintf("ISP: %s\nCountry: %s\nRegion: %s\nCity: %s\nTimezone: %s\nGMT-Offset: %s", f.ISP, f.Country, f.Region, f.City, f.Timezone, f.GMTOffset),
@@ -231,30 +231,65 @@ func dcCommandLBar(command []string, s *discordgo.Session, m *discordgo.MessageC
 }
 
 func dcCommandHelp(command []string, s *discordgo.Session, m *discordgo.MessageCreate) {
-    commands := [][]string {
-        {"Chicken", "Posts an image of TF2 Scout turning into a chicken", ""},
-        {"Sosig", "Posts a gif of a man doing tricks with a sausage", ""},
-        {"IPLookup", "Replies with information of the IP given to it", ""},
-        {"Fumo", "Posts a random image of a fumo", ""},
-        {"LBar", "Sends a 10 second loading bar with the given title", ""},
+    // Get prefix
+    PREFIX := os.Getenv("PREFIX")
+
+    // Create 2D command array for command information
+    commands := [][5]string {
+        {"Chicken", fmt.Sprintf("%s chicken", PREFIX), "Bucket of chicken", "Posts an image of TF2 Scout turning into a chicken"},
+        {"Sosig", fmt.Sprintf("%s sosig", PREFIX), "Sosig flip", "Posts a gif of a man doing tricks with a sausage"},
+        {"IPLookup", fmt.Sprintf("%s sosig [IP_address/hostname]", PREFIX), "IP Address/Hostname information", "Provides useful information relating to a provided IP address or hostname"},
+        {"Fumo", fmt.Sprintf("%s fumo", PREFIX), "Random Fumo", "Posts a random image of a fumo via a web API"},
+        {"LBar", fmt.Sprintf("%s lbar [bar_name]", PREFIX), "Loading bar", "Sends a 10 second loading bar with the given title"},
+        {"Help", fmt.Sprintf("%s help [command_name]", PREFIX), "Type \"help [command_name]\" for more information", "Provides a list of available commands. Provides more detailed information when a specific command name is provided"},
     }
+    
+    // Pair command name with command short description
     if len(command) == 2 {
         message := []string{}
-        for i := 0; i < len(commands)-1; i++ {
-            s := []string{commands[i][0], commands[i][1]}
+        for i := 0; i <= len(commands)-1; i++ {
+            s := []string{commands[i][0], commands[i][2]}
             t := strings.Join(s, " - ")
             message = append(message, t)
         }
-        embed := &discordgo.MessageEmbed{
+
+        // Generate Discord embed
+        embed := &discordgo.MessageEmbed {
             Color:       0xff1100, // Red
             Title:       "Available Commands",
             Description: fmt.Sprintf(strings.Join(message, "\n")),
         }
+
+        // Send Discord embed 
         s.ChannelMessageSendEmbed(m.ChannelID, embed)
     } else if len(command) == 3 {
+        // Provide more specific information about a specified command
+        var commandIndex int = -1
+        for i := 0; i <= len(commands)-1; i++ {
+            if strings.ToLower(command[2]) == strings.ToLower(commands[i][0]) {
+                commandIndex = i
+                break
+            } 
+        }
         
+        // Checks if commandIndex was unchanged
+        if commandIndex == -1 {
+            s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("Command not found.\nType \"%s help\" for a list of available commands", PREFIX))
+            return
+        }
+
+        // Generate Discord embed
+        embed := &discordgo.MessageEmbed {
+            Color:       0xff1100, // Red
+            Title:       fmt.Sprintf("Command: %s | Usage: %s", commands[commandIndex][0], commands[commandIndex][1]),
+            Description: commands[commandIndex][3],
+        }
+
+        // Send Discord embed
+        s.ChannelMessageSendEmbed(m.ChannelID, embed)
+
     } else {
-        // im slow im sorry IM READING DOCS -_-
+        s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("Incorrect usage.\nType \"%s help\" for a list of available commands", PREFIX))
     }
 
 }
