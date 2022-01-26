@@ -246,18 +246,31 @@ func dcCommandHelp(command []string, s *discordgo.Session, m *discordgo.MessageC
     
     // Pair command name with command short description
     if len(command) == 2 {
-        message := []string{}
+
+        fields := []*discordgo.MessageEmbedField{}
         for i := 0; i <= len(commands)-1; i++ {
-            s := []string{commands[i][0], commands[i][2]}
-            t := strings.Join(s, " - ")
-            message = append(message, t)
+            title := commands[i][0]
+            value := commands[i][2]
+            field := &discordgo.MessageEmbedField{
+                Name: title,
+                Value: value,
+            }
+            fields = append(fields, field)
+        }
+        
+        // Generate a footer for the github repository link
+        footer := &discordgo.MessageEmbedFooter{
+            Text: "Github Repo: https://github.com/Euvaz/DinGo",
+            IconURL: "https://cdn-icons-png.flaticon.com/512/25/25231.png",
         }
 
         // Generate Discord embed
         embed := &discordgo.MessageEmbed {
             Color:       0xff1100, // Red
             Title:       "Available Commands",
-            Description: fmt.Sprintf(strings.Join(message, "\n")),
+            Description: "",
+            Fields: fields,
+            Footer: footer,
         }
 
         // Send Discord embed 
@@ -277,12 +290,31 @@ func dcCommandHelp(command []string, s *discordgo.Session, m *discordgo.MessageC
             s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("Command not found.\nType \"%s help\" for a list of available commands", PREFIX))
             return
         }
+        
+        // Gets information about the command from the command list
+        commandName := commands[commandIndex][0]
+        commandUsage := commands[commandIndex][1]
+        commandDescription := commands[commandIndex][3]
+        
+        // Generate fields for the embed
+        fields := []*discordgo.MessageEmbedField {
+            &discordgo.MessageEmbedField{Name: "Usage", Value: commandUsage,},
+            &discordgo.MessageEmbedField{Name: "Description", Value: commandDescription,},
+        }
+
+        // Generate a footer for the github repository link
+        footer := &discordgo.MessageEmbedFooter{
+            Text: "Github Repo: https://github.com/Euvaz/DinGo",
+            IconURL: "https://cdn-icons-png.flaticon.com/512/25/25231.png",
+        }
 
         // Generate Discord embed
         embed := &discordgo.MessageEmbed {
             Color:       0xff1100, // Red
-            Title:       fmt.Sprintf("Command: %s | Usage: %s", commands[commandIndex][0], commands[commandIndex][1]),
-            Description: commands[commandIndex][3],
+            Title:       fmt.Sprintf("Command: %s ", commandName),
+            Description: "",
+            Fields: fields,
+            Footer: footer,
         }
 
         // Send Discord embed
