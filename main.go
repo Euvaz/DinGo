@@ -299,8 +299,8 @@ func dcCommandHelp(command []string, s *discordgo.Session, m *discordgo.MessageC
         
         // Generate fields for the embed
         fields := []*discordgo.MessageEmbedField {
-            &discordgo.MessageEmbedField{Name: "Usage", Value: commandUsage,},
-            &discordgo.MessageEmbedField{Name: "Description", Value: commandDescription,},
+            {Name: "Usage", Value: commandUsage,},
+            {Name: "Description", Value: commandDescription,},
         }
 
         // Generate a footer for the github repository link
