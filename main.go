@@ -143,7 +143,7 @@ func dcCommandIPLookup(command []string, s *discordgo.Session, m *discordgo.Mess
         return
     }
     // Make API call for JSON data
-    resp, err := http.Get("http://ipwhois.app/json/" + command[2])
+    resp, err := http.Get("http://ipwhois.app/json/" + strings.ToLower(command[2]))
     handlePanic(err)
 
     defer resp.Body.Close()
@@ -151,6 +151,7 @@ func dcCommandIPLookup(command []string, s *discordgo.Session, m *discordgo.Mess
     // On successful API call
     if resp.StatusCode == 200 {
         type Response struct {
+            IP        string `json:"ip"`
             ISP       string `json:"isp"`
             Country   string `json:"country"`
             Region    string `json:"region"`
@@ -167,8 +168,8 @@ func dcCommandIPLookup(command []string, s *discordgo.Session, m *discordgo.Mess
         // Generate Discord embed
         embed := &discordgo.MessageEmbed {
             Color:       0xff1100, // Red
-            Title:       "IP lookup results for " + command[2],
-            Description: fmt.Sprintf("ISP: %s\nCountry: %s\nRegion: %s\nCity: %s\nTimezone: %s\nGMT-Offset: %s", f.ISP, f.Country, f.Region, f.City, f.Timezone, f.GMTOffset),
+            Title:       "IP lookup results for " + strings.ToLower(command[2]),
+            Description: fmt.Sprintf("IP: %s\nISP: %s\nCountry: %s\nRegion: %s\nCity: %s\nTimezone: %s\nGMT-Offset: %s", f.IP, f.ISP, f.Country, f.Region, f.City, f.Timezone, f.GMTOffset),
         }
 
         // Send Discord embed
