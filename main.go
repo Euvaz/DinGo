@@ -223,13 +223,13 @@ func dcCommandLBar(command []string, s *discordgo.Session, m *discordgo.MessageC
     }
 
     // Send initial message
-    message, err := s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%s[%s] 0%%", barTitle, strings.Repeat("-", 10)))
+    message, err := s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%s`[%s] 0%%`", barTitle, strings.Repeat("-", 10)))
     handlePanic(err)
 
     // Send an empty bar and edit the message to "load"
     for i := 1; i <= 10; i++ {
         time.Sleep(time.Second)
-        s.ChannelMessageEdit(m.ChannelID, message.ID, fmt.Sprintf("%s[%s%s] %d0%%", barTitle, strings.Repeat("#", i), strings.Repeat("-", 10-i), i))
+        s.ChannelMessageEdit(m.ChannelID, message.ID, fmt.Sprintf("%s`[%s%s] %d0%%`", barTitle, strings.Repeat("#", i), strings.Repeat("-", 10-i), i))
     }
 }
 
