@@ -89,7 +89,7 @@ func initializeDiscord() *discordgo.Session {
 func dcOnMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
     // Ignore all messages created by the bot itself
-    if m.Author.ID == s.State.User.ID {
+    if m.Author.ID == s.State.User.ID || m.Author.Bot == true {
         return
     }
 
