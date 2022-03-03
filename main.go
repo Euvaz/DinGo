@@ -113,6 +113,8 @@ func dcOnMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
             dcCommandFumo(command, s, m)
         case "help":
             dcCommandHelp(command, s, m)
+        case "resolve":
+            dcCommandResolve(command, s, m)
         default:
             // Generate Discord embed
             embed := &discordgo.MessageEmbed{
@@ -333,8 +335,14 @@ func dcCommandHelp(command []string, s *discordgo.Session, m *discordgo.MessageC
 
 }
 
-func messageCreate() {
+func dcCommandResolve(command []string, s *discordgo.Session, m *discordgo.MessageCreate) {
+    channel, err := s.Channel(m.ChannelID)
+    handlePanic(err)
+    if channel.IsThread() {
 
+        s.ChannelEditComplex(m.ChannelID, &discordgo.ChannelEdit{Archived: true})
+        println("Archived")
+    }
 }
 
 func handlePanic(err error) {
