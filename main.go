@@ -113,6 +113,8 @@ func dcOnMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
             dcCommandFumo(command, s, m)
         case "help":
             dcCommandHelp(command, s, m)
+        case "resolve":
+            dcCommandResolve(command, s, m)
         default:
             // Generate Discord embed
             embed := &discordgo.MessageEmbed{
@@ -123,6 +125,10 @@ func dcOnMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
             // Send Discord embed
             s.ChannelMessageSendEmbed(m.ChannelID, embed)
         }
+    }
+    if m.ChannelID == "948778347528339507" {
+        s.MessageThreadStart(m.ChannelID, m.ID, m.Author.Username, 60)
+
     }
 }
 
@@ -327,6 +333,16 @@ func dcCommandHelp(command []string, s *discordgo.Session, m *discordgo.MessageC
         s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("Incorrect usage.\nType \"%s help\" for a list of available commands", PREFIX))
     }
 
+}
+
+func dcCommandResolve(command []string, s *discordgo.Session, m *discordgo.MessageCreate) {
+    channel, err := s.Channel(m.ChannelID)
+    handlePanic(err)
+    if channel.IsThread() {
+
+        s.ChannelEditComplex(m.ChannelID, &discordgo.ChannelEdit{Archived: true})
+        println("Archived")
+    }
 }
 
 func handlePanic(err error) {
