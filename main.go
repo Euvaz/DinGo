@@ -127,8 +127,11 @@ func dcOnMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
         }
     }
 
+    // Define support channel ID
+    SUPPORT_CHANNEL_ID := os.Getenv("SUPPORT_CHANNEL_ID")
+
     // Check if message was sent in the designated support channel
-    if m.ChannelID == "948824695250239508" {
+    if m.ChannelID == SUPPORT_CHANNEL_ID {
         // Create thread based off message sender
         thread, err := s.MessageThreadStart(m.ChannelID, m.ID, m.Author.Username, 1440)
         handlePanic(err)
