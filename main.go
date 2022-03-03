@@ -126,9 +126,16 @@ func dcOnMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
             s.ChannelMessageSendEmbed(m.ChannelID, embed)
         }
     }
-    if m.ChannelID == "948778347528339507" {
-        s.MessageThreadStart(m.ChannelID, m.ID, m.Author.Username, 60)
 
+    // Check if message was sent in the designated support channel
+    if m.ChannelID == "948824695250239508" {
+        // Create thread based off message sender
+        thread, err := s.MessageThreadStart(m.ChannelID, m.ID, m.Author.Username, 1440)
+        handlePanic(err)
+
+        // Send messages on thread creation
+        s.ChannelMessageSend(thread.ID, "Hi there! I have created this support thread for you.")
+        s.ChannelMessageSend(thread.ID, "If you no longer need assistance, please use the `$ resolve` command to archive this thread.")
     }
 }
 
@@ -336,12 +343,14 @@ func dcCommandHelp(command []string, s *discordgo.Session, m *discordgo.MessageC
 }
 
 func dcCommandResolve(command []string, s *discordgo.Session, m *discordgo.MessageCreate) {
+    // Set channel variable
     channel, err := s.Channel(m.ChannelID)
     handlePanic(err)
-    if channel.IsThread() {
 
+    // Set thread to archived
+    if channel.IsThread() {
         s.ChannelEditComplex(m.ChannelID, &discordgo.ChannelEdit{Archived: true})
-        println("Archived")
+        fmt.Printf("Archived thread with ID: %s", m.ChannelID)
     }
 }
 
