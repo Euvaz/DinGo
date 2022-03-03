@@ -124,6 +124,10 @@ func dcOnMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
             s.ChannelMessageSendEmbed(m.ChannelID, embed)
         }
     }
+    if m.ChannelID == "948778347528339507" {
+        s.MessageThreadStart(m.ChannelID, m.ID, m.Author.Username, 60)
+
+    }
 }
 
 func dcCommandChicken(command []string, s *discordgo.Session, m *discordgo.MessageCreate) {
@@ -326,6 +330,10 @@ func dcCommandHelp(command []string, s *discordgo.Session, m *discordgo.MessageC
     } else {
         s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("Incorrect usage.\nType \"%s help\" for a list of available commands", PREFIX))
     }
+
+}
+
+func messageCreate() {
 
 }
 
