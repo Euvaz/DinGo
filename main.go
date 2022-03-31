@@ -199,7 +199,7 @@ func dcCommandIPLookup(command []string, s *discordgo.Session, m *discordgo.Mess
 
 func dcCommandFumo(command []string, s *discordgo.Session, m *discordgo.MessageCreate) {
     // Make API call for JSON data
-    resp, err := http.Get("https://fumoapi.herokuapp.com/random")
+    resp, err := http.Get("https://fumoapi.nosesisaid.me/random")
     handlePanic(err)
 
     defer resp.Body.Close()
