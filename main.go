@@ -136,6 +136,8 @@ func dcOnMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
         thread, err := s.MessageThreadStart(m.ChannelID, m.ID, m.Author.Username, 1440)
         handlePanic(err)
 
+        log.Printf("Created thread with ID: %s", m.ChannelID)
+
         // Send messages on thread creation
         s.ChannelMessageSend(thread.ID, "Hi there! I have created this support thread for you.")
         s.ChannelMessageSend(thread.ID, "If you no longer need assistance, please use the `$ resolve` command to archive this thread.")
@@ -197,7 +199,7 @@ func dcCommandIPLookup(command []string, s *discordgo.Session, m *discordgo.Mess
 
 func dcCommandFumo(command []string, s *discordgo.Session, m *discordgo.MessageCreate) {
     // Make API call for JSON data
-    resp, err := http.Get("https://fumoapi.herokuapp.com/random")
+    resp, err := http.Get("https://fumoapi.nosesisaid.me/random")
     handlePanic(err)
 
     defer resp.Body.Close()
@@ -350,10 +352,14 @@ func dcCommandResolve(command []string, s *discordgo.Session, m *discordgo.Messa
     channel, err := s.Channel(m.ChannelID)
     handlePanic(err)
 
+    // Define support channel ID
+    SUPPORT_CHANNEL_ID := os.Getenv("SUPPORT_CHANNEL_ID")
+
+    fmt.Printf("Channel ID: %s\nSupport Channel ID: %s\n", channel.ID, SUPPORT_CHANNEL_ID)
     // Set thread to archived
     if channel.IsThread() {
         s.ChannelEditComplex(m.ChannelID, &discordgo.ChannelEdit{Archived: true})
-        fmt.Printf("Archived thread with ID: %s", m.ChannelID)
+        log.Printf("Archived thread with ID: %s", m.ChannelID)
     }
 }
 
