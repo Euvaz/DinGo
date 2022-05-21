@@ -19,4 +19,4 @@ This will result in a `main` executable file being created, with the filetype de
 
 ## LICENSE
 
-As of 18-Jan-2022, Gost is fully open to the public, licensed under GPLv2.
+As of 18-Jan-2022, DinGo is fully open to the public, licensed under GPLv2.
