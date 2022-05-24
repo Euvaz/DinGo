@@ -10,7 +10,6 @@ import (
     "os/signal"
     "strings"
     "syscall"
-    "time"
 
     "github.com/bwmarrin/discordgo"
     "github.com/joho/godotenv"
@@ -44,6 +43,10 @@ var (
         {
             Name: "fumo",
             Description: "posts a random fumo image",
+        },
+        {
+            Name: "resolve",
+            Description: "closes the support thread",
         },
     }
 
@@ -143,6 +146,29 @@ var (
                 log.Println("Received HTTP status code:", resp.StatusCode)
             }
         },
+        "resolve": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+            // Set channel variable
+            channel, err := s.Channel(i.ChannelID)
+            handlePanic(err)
+
+            s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: "closing thread",
+					
+				},
+			})
+
+            // Define support channel ID
+            SUPPORT_CHANNEL_ID := os.Getenv("SUPPORT_CHANNEL_ID")
+
+            fmt.Printf("Channel ID: %s\nSupport Channel ID: %s\n", i.ChannelID, SUPPORT_CHANNEL_ID)
+            // Set thread to archived
+            if channel.IsThread() {
+                s.ChannelEditComplex(i.ChannelID, &discordgo.ChannelEdit{Archived: true})
+                log.Printf("Archived thread with ID: %s", i.ChannelID)
+            }
+        },
     }
 
 
@@ -151,8 +177,6 @@ var (
 func init() {
     // Initialize environment
     godotenv.Load()
-
-
 }
 
 func main() {
@@ -231,22 +255,6 @@ func dcOnMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
         return
     }
 
-    // Define bot prefix
-    PREFIX := os.Getenv("PREFIX")
-
-    // Check for command prefix
-    if strings.HasPrefix(m.Content, PREFIX) {
-
-        // Switch case for command functions
-        // Lbar and Resolve commands will be moved to slash commands later
-        switch command := strings.Fields(m.Content); strings.ToLower(command[1]) {
-        case "lbar":
-            dcCommandLBar(command, s, m)
-        case "resolve":
-            dcCommandResolve(command, s, m)
-        }
-    }
-
     // Define support channel ID
     SUPPORT_CHANNEL_ID := os.Getenv("SUPPORT_CHANNEL_ID")
 
@@ -261,51 +269,6 @@ func dcOnMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
         // Send messages on thread creation
         s.ChannelMessageSend(thread.ID, "Hi there! I have created this support thread for you.")
         s.ChannelMessageSend(thread.ID, "If you no longer need assistance, please use the `$ resolve` command to archive this thread.")
-    }
-}
-
-func dcCommandLBar(command []string, s *discordgo.Session, m *discordgo.MessageCreate) {
-    // Define barTitle variable
-    barTitle := ""
-    if len(command) == 2 {
-        barTitle = ""
-    } else if len(command) >= 3 && len(command) <= 7 {
-        for i := 2; i <= len(command)-1; i++ {
-            if len(command[i]) > 10 {
-                s.ChannelMessageSend(m.ChannelID, "Too many characters")
-                return
-            }
-        }
-        barTitle = fmt.Sprintf("%s\n", strings.Join(command[2:], " "))
-    } else {
-        s.ChannelMessageSend(m.ChannelID, "Message is too long")
-        return
-    }
-
-    // Send initial message
-    message, err := s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%s`[%s] 0%%`", barTitle, strings.Repeat("-", 10)))
-    handlePanic(err)
-
-    // Send an empty bar and edit the message to "load"
-    for i := 1; i <= 10; i++ {
-        time.Sleep(time.Second)
-        s.ChannelMessageEdit(m.ChannelID, message.ID, fmt.Sprintf("%s`[%s%s] %d0%%`", barTitle, strings.Repeat("#", i), strings.Repeat("-", 10-i), i))
-    }
-}
-
-func dcCommandResolve(command []string, s *discordgo.Session, m *discordgo.MessageCreate) {
-    // Set channel variable
-    channel, err := s.Channel(m.ChannelID)
-    handlePanic(err)
-
-    // Define support channel ID
-    SUPPORT_CHANNEL_ID := os.Getenv("SUPPORT_CHANNEL_ID")
-
-    fmt.Printf("Channel ID: %s\nSupport Channel ID: %s\n", channel.ID, SUPPORT_CHANNEL_ID)
-    // Set thread to archived
-    if channel.IsThread() {
-        s.ChannelEditComplex(m.ChannelID, &discordgo.ChannelEdit{Archived: true})
-        log.Printf("Archived thread with ID: %s", m.ChannelID)
     }
 }
 
