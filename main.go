@@ -268,7 +268,7 @@ func dcOnMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
         // Send messages on thread creation
         s.ChannelMessageSend(thread.ID, "Hi there! I have created this support thread for you.")
-        s.ChannelMessageSend(thread.ID, "If you no longer need assistance, please use the `$ resolve` command to archive this thread.")
+        s.ChannelMessageSend(thread.ID, "If you no longer need assistance, please use the `/resolve` command to archive this thread.")
     }
 }
 
